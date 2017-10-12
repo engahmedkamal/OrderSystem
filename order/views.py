@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from .forms import UserForm
+from .forms import UserForm, OrderForm
+from .models import Order
 
 
 def index(request):
@@ -45,3 +46,12 @@ def register(request):
             login(request, user)
             return render(request, 'order/index.html')
     return render(request, 'order/register.html', {'form': form})
+
+
+def create_order(request):
+    form = OrderForm(request.POST or None)
+    if form.is_valid():
+        order = form.save(commit=False)
+        order.creator = request.user
+        order.save()
+    return render(request, 'order/create_order.html', {'form': form})
