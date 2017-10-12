@@ -54,4 +54,5 @@ def create_order(request):
         order = form.save(commit=False)
         order.creator = request.user
         order.save()
+        return render(request, 'order/index.html')
     return render(request, 'order/create_order.html', {'form': form})
