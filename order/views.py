@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth import authenticate, login, logout
 from .forms import UserForm
 
 
@@ -40,10 +40,8 @@ def register(request):
         password = form.cleaned_data['password']
         user.set_password(password)
         user.save()
-        user = authenticate(username=username,password=password)
+        user = authenticate(username=username, password=password)
         if user is not None and user.is_active:
-            login(request,user)
+            login(request, user)
             return render(request, 'order/index.html')
-    return render(request,'order/register.html',{'form':form})
-
-
+    return render(request, 'order/register.html', {'form': form})
