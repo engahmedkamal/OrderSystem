@@ -21,7 +21,7 @@ class Order(models.Model):
 class OrderDetail(models.Model):
     order_name = models.CharField(max_length=250)
     price = models.DecimalField(max_digits=6, decimal_places=2)
-    count = models.IntegerField(max_length=3)
+    quantity = models.IntegerField(max_length=3)
     description = models.CharField(max_length=250)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     order_id = models.ForeignKey(Order, on_delete=models.CASCADE)
