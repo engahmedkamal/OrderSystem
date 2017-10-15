@@ -4,10 +4,20 @@
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <center>{{ order }}</center>
+                <center>{{ order }} - 
+                    {% if order.status == '0' %}
+                        Open
+                    {% endif %}
+                    {% if order.status == '1' %}
+                        On Delivery
+                    {% endif %}
+                    {% if order.status == '2' %}
+                        Delivered
+                    {% endif %}
+                </center>
             </div>
             <div>
-                <center><a  target="_blank"  href="{{ order.menu_url }}">menu</a></center>
+                <center><a target="_blank" href="{{ order.menu_url }}">menu</a></center>
             </div>
             <div class="panel-body">
                 {% for key,v in order_detail.items %}
@@ -35,12 +45,13 @@
                     </form>
                 </center>
             {% endif %}
-            {% if user == order.creator %}
+            {% if user == order.creator and order.status == '0' %}
                 <center>
-                <form method="post" action="{% url 'order:order_sum' order.id %}">
-                            {% csrf_token %}
-                            <br><button class="btn btn-danger" type="submit">Order Now</button>
-                </form>
+                    <form method="post" action="{% url 'order:order_sum' order.id %}">
+                        {% csrf_token %}
+                        <br>
+                        <button class="btn btn-danger" type="submit">Order Now</button>
+                    </form>
                 </center>
             {% endif %}
         </div>

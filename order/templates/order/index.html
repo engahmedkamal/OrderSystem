@@ -34,6 +34,12 @@
                                             {% if order.status == '0' %}
                                                 Open
                                             {% endif %}
+                                            {% if order.status == '1' %}
+                                                On Delivery
+                                            {% endif %}
+                                            {% if order.status == '2' %}
+                                                Delivered
+                                            {% endif %}
                                         </td>
                                         <td>
                                             {% if user.id == order.creator.id %}
@@ -46,7 +52,8 @@
                                                     </button>
                                                 </form>
                                             {% endif %}
-                                            <a href="{% url 'order:main_order' order.id %}" class="btn btn-default btn-sm btn-favorite" role="button">
+                                            <a href="{% url 'order:main_order' order.id %}"
+                                               class="btn btn-default btn-sm btn-favorite" role="button">
                                                 <span class="glyphicon glyphicon-plus"></span>
                                             </a>
                                         </td>
