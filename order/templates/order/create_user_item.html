@@ -1,5 +1,5 @@
 {% extends 'order/base.html' %}
-{% block title %}Add a New Order{% endblock %}
+{% block title %}Add a New Item{% endblock %}
 {% block orders_active %}active{% endblock %}
 
 {% block body %}
@@ -10,7 +10,7 @@
         <div class="col-sm-12 col-md-7">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <h3>Add a New Order</h3>
+                    <h3>Add a New Item</h3>
                     {% if error_message %}
                         <p><strong>{{ error_message }}</strong></p>
                     {% endif %}
