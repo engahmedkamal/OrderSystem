@@ -45,12 +45,10 @@
                                                         <span class="glyphicon glyphicon-trash"></span>
                                                     </button>
                                                 </form>
-                                                <!-- Add Order Detail -->
-                                                {#                                                {% url 'order:detail' order.id %}#}
-                                                <a href="" class="btn btn-default btn-sm btn-favorite" role="button">
-                                                    <span class="glyphicon glyphicon-plus"></span>
-                                                </a>
                                             {% endif %}
+                                            <a href="{% url 'order:main_order' order.id %}" class="btn btn-default btn-sm btn-favorite" role="button">
+                                                <span class="glyphicon glyphicon-plus"></span>
+                                            </a>
                                         </td>
                                     </tr>
                                 {% endfor %}

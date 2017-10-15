@@ -1,0 +1,48 @@
+{% extends 'order/base.html' %}
+{% block title %}{{ order }}{% endblock %}
+{% block body %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <center>{{ order }}</center>
+            </div>
+            <div>
+                <center><a  target="_blank"  href="{{ order.menu_url }}">menu</a></center>
+            </div>
+            <div class="panel-body">
+                {% for key,v in order_detail.items %}
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            {{ key.first_name }} {{ key.last_name }}
+                            {% if user == key  and order.status == '0' %}
+                                <a href="{% url 'order:user_order' order.id %}">edit</a>
+                                <a href="{% url 'order:delete_user_order' order.id %}">delete</a>
+                            {% endif %}
+                        </div>
+                        {% for order in v %}
+                            <div class="panel-body">{{ order.item_name }} - {{ order.quantity }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            {% if user not in order_detail.keys and order.status == '0' %}
+                <center>
+                    <form method="post" action="{% url 'order:user_order' order.id %}">
+                        {% csrf_token %}
+                        <button class="btn btn-success" type="submit">Add Order</button>
+                    </form>
+                </center>
+            {% endif %}
+            {% if user == order.creator %}
+                <center>
+                <form method="post" action="{% url 'order:order_sum' order.id %}">
+                            {% csrf_token %}
+                            <br><button class="btn btn-danger" type="submit">Order Now</button>
+                </form>
+                </center>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
