@@ -35,14 +35,14 @@
                     </form>
                 </center>
             {% endif %}
-        {% if user == order.creator %}
-            <center>
-            <form method="post" action="{% url 'order:user_order' order.id %}">
-                        {% csrf_token %}<br>
-                        <button class="btn btn-danger" type="submit">Order Now</button>
-            </form>
-            </center>
-        {% endif %}
+            {% if user == order.creator %}
+                <center>
+                <form method="post" action="{% url 'order:order_sum' order.id %}">
+                            {% csrf_token %}
+                            <br><button class="btn btn-danger" type="submit">Order Now</button>
+                </form>
+                </center>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

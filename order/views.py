@@ -82,3 +82,15 @@ def delete_order(request, order_id):
 def delete_orderDetail(request, order_id):
     OrderDetail.objects.filter(user__id=request.user.id,order__id=order_id).delete()
     return order_detail_view(request, order_id)
+
+def order_sum(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    template_name = 'order/orderSumPage.html'
+    orders_dict={}
+    for orderDet in order.orderdetail_set.all():
+        if orders_dict.has_key(orderDet.item_name) :
+            orders_dict[orderDet.item_name] =  orders_dict.get(orderDet.item_name)+orderDet.quantity
+        else:
+            orders_dict[orderDet.item_name] = orderDet.quantity
+    return render(request, template_name, {'order': order, 'order_details': orders_dict})
+

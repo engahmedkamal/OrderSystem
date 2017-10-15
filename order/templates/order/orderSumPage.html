@@ -1,0 +1,11 @@
+{% extends 'order/base.html' %}
+{% block title %}{{ order }}{% endblock %}
+{% block body %}
+    <h1>Summation order from {{ order }}</h1>
+     <div class="container">
+        <div class="panel panel-default">
+            {% for key,v in order_detail.items %}
+            {% endfor %}
+        </div>
+     </div>
+{% endblock %}
