@@ -5,7 +5,6 @@ from django.shortcuts import render, get_object_or_404
 
 import datetime
 
-
 def redirect_to_index(request):
     orders = Order.objects.all().order_by('timestamp');
     return render(request, 'order/index.html', {'orders': orders})
@@ -93,7 +92,7 @@ def create_user_item(request, order_id):
         order_detail.order = Order.objects.get(pk=order_id)
         order_detail.save()
         return user_order(request, order_id)
-    return render(request, 'order/create_order.html', {'form' : form})
+    return render(request, 'order/create_user_item.html', {'form' : form})
 
 
 def delete_user_item(request, order_id, user_item_id):

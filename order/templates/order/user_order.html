@@ -4,34 +4,45 @@
 
 {% block body %}
 
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>Item Name</th>
-            <th>Description</th>
-            <th>Quantity</th>
-            <th>Options</th>
-        </tr>
-        </thead>
-        <tbody>
+    {% if user_orders %}
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>Options</th>
+            </tr>
+            </thead>
+            <tbody>
             {% for user_order in user_orders %}
                 <tr>
                     <td>{{ user_order.item_name }}</td>
                     <td>{{ user_order.description }}</td>
                     <td>{{ user_order.quantity }}</td>
                     <td>
-                        <a href="{% url 'order:delete_user_item' user_order.order.id user_order.id %}" class="btn btn-default btn-sm btn-favorite" role="button">
+                        <a href="{% url 'order:delete_user_item' user_order.order.id user_order.id %}"
+                           class="btn btn-default btn-sm btn-favorite" role="button">
                             <span class="glyphicon glyphicon-trash"></span>
                         </a>
                     </td>
                 </tr>
             {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    {% endif %}
 
     <div align="center">
         <a href="{% url 'order:create_user_item' order_id %}" class="btn btn-success" role="button">
             <span class="glyphicon glyphicon-add"></span>Add Item
+        </a>
+    </div>
+
+    <br>
+
+    <div align="center">
+        <a href="{% url 'order:main_order' order_id %}" class="btn btn-success" role="button">
+            <span class="glyphicon glyphicon-back"></span>Back To Main Order
         </a>
     </div>
 
