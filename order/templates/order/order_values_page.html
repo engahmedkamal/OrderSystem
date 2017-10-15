@@ -1,0 +1,27 @@
+{% extends 'order/base.html' %}
+{% block title %}{{ order }}{% endblock %}
+{% block body %}
+    <form method="post" action="{% url 'order:order_sum_redirect' order.id %}">
+        <div class="container">
+            <h1>Summation order from {{ order }}</h1>
+            {% for key,v in order_details.items %}
+                <div class="panel panel-default">
+                    <center><h3> {{ key }} - {{ v }}</h3></center>
+                </div>
+            {% endfor %}
+            <div>
+                {% csrf_token %}
+                <div class="row">
+                    <div class="container form-group col-sm-4">
+                        <label for="delivery_time">delivery time :</label>
+                        <input type="number" class="form-control" name="delivery_time" id="delivery_time">
+                    </div>
+                </div>
+                <br><br>
+                <div class="row">
+                    <button class=" col-md-2 col-md-offset-5 btn btn-danger" type="submit">waiting for delivery</button>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}

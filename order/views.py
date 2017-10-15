@@ -134,8 +134,7 @@ def order_sum_redirect(request, order_id):
     return order_detail_view(request, order_id)
 
 
-def enter_order_values(request, order_id):
+def order_values(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    template_name = 'order/order_sum_page.html'
     orders_dict = order_grouping_by_user(order)
-    return render(request, template_name, {'order': order, 'order_details': orders_dict})
+    return render(request, 'order/order_values_page.html', {'order': order, 'order_details': orders_dict})
