@@ -21,6 +21,8 @@ class OrderForm(forms.ModelForm):
 
 class OrderDetailForm(forms.ModelForm):
 
+    description = forms.CharField(required=False)
+
     class Meta:
         model = OrderDetail
         fields = ['item_name', 'description', 'quantity']

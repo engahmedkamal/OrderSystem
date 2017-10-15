@@ -4,7 +4,6 @@ from .models import Order, OrderDetail
 from django.shortcuts import render, get_object_or_404
 
 
-
 def redirect_to_index(request):
     orders = Order.objects.all().order_by('timestamp');
     return render(request, 'order/index.html', {'orders': orders})
@@ -78,6 +77,7 @@ def delete_order(request, order_id):
     order.delete()
     return redirect_to_index(request)
 
+
 def user_order(request, order_id):
     user_orders = OrderDetail.objects.filter(user=request.user, order=Order.objects.filter(pk=order_id))
     return render(request,'order/user_order.html', {'user_orders' : user_orders, 'order_id' : order_id})
@@ -91,7 +91,7 @@ def create_user_item(request, order_id):
         order_detail.order = Order.objects.get(pk=order_id)
         order_detail.save()
         return user_order(request, order_id)
-    return render(request, 'order/create_order.html', {'form' : form})
+    return render(request, 'order/create_user_item.html', {'form' : form})
 
 
 def delete_user_item(request, order_id, user_item_id):
