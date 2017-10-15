@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate,login,logout
 from .forms import UserForm
-
+from django.views import generic
+from .models import Order,OrderDetail
+from django.shortcuts import render,get_object_or_404
 
 def index(request):
     if not request.user.is_authenticated():
@@ -47,3 +49,10 @@ def register(request):
     return render(request,'order/register.html',{'form':form})
 
 
+def order_detail_view(request,order_id):
+    order = get_object_or_404(Order,id=order_id)
+    template_name = 'order/orderMainPage.html'
+    order_detail_grouped_by_user = dict()
+    for obj in order.orderdetail_set.all():
+        order_detail_grouped_by_user.setdefault(obj.user, []).append(obj)
+    return render(request,template_name,{'order':order,'order_detail':order_detail_grouped_by_user})

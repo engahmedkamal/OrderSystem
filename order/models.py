@@ -26,4 +26,4 @@ class OrderDetail(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.order_name
+        return self.item_name
