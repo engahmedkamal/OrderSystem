@@ -4,11 +4,17 @@ from .forms import UserForm, OrderForm
 from .models import Order
 
 
+def redirect_to_index(request):
+    orders = Order.objects.all().order_by('timestamp');
+    return render(request, 'order/index.html', {'orders': orders})
+
+
 def index(request):
     if not request.user.is_authenticated():
         return render(request, 'order/login.html')
     else:
-        return render(request, 'order/index.html')
+        return redirect_to_index(request)
+
 
 
 def logout_user(request):
@@ -25,7 +31,7 @@ def login_user(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return render(request, 'order/index.html')
+                return redirect_to_index(request)
             else:
                 return render(request, 'order/login.html', {'error_message': 'Your account has been disabled'})
         else:
@@ -44,7 +50,7 @@ def register(request):
         user = authenticate(username=username, password=password)
         if user is not None and user.is_active:
             login(request, user)
-            return render(request, 'order/index.html')
+            return redirect_to_index(request)
     return render(request, 'order/register.html', {'form': form})
 
 
@@ -54,5 +60,11 @@ def create_order(request):
         order = form.save(commit=False)
         order.creator = request.user
         order.save()
-        return render(request, 'order/index.html')
+        return redirect_to_index(request)
     return render(request, 'order/create_order.html', {'form': form})
+
+
+def delete_order(request, order_id):
+    order = Order.objects.get(pk=order_id)
+    order.delete()
+    return redirect_to_index(request)
