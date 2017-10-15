@@ -4,8 +4,8 @@
     <div class="container">
         <h1>Summation order from {{ order }}</h1>
         {% for key,v in order_details.items %}
-            <div class="panel panel-default">
-                <center><h3> {{ key }} - {{ v }}</h3></center>
+            <div class="panel panel-default" align="center">
+                <<h3> {{ key }} - {{ v }}</h3>
             </div>
         {% endfor %}
         <div>
@@ -13,7 +13,7 @@
                 {% csrf_token %}
                 <div class="row">
                     <div class="container form-group col-sm-4">
-                        <label for="delivery_time" >delivery time :</label>
+                        <label for="delivery_time" >delivery time in minutes :</label>
                         <input type="number" class="form-control" name="delivery_time" id="delivery_time">
                     </div>
                 </div>
