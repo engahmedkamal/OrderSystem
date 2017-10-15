@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from .forms import UserForm, OrderForm
 from .models import Order
 from .models import OrderDetail
-
+import datetime
 
 def redirect_to_index(request):
     orders = Order.objects.all().order_by('timestamp');
@@ -57,7 +57,7 @@ def register(request):
 
 def order_detail_view(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    template_name = 'order/orderMainPage.html'
+    template_name = 'order/order_main_page.html'
     order_detail_grouped_by_user = dict()
     for obj in order.orderdetail_set.all():
         order_detail_grouped_by_user.setdefault(obj.user, []).append(obj)
@@ -79,18 +79,28 @@ def delete_order(request, order_id):
     order.delete()
     return redirect_to_index(request)
 
+
 def delete_orderDetail(request, order_id):
-    OrderDetail.objects.filter(user__id=request.user.id,order__id=order_id).delete()
+    OrderDetail.objects.filter(user__id=request.user.id, order__id=order_id).delete()
     return order_detail_view(request, order_id)
+
 
 def order_sum(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    template_name = 'order/orderSumPage.html'
-    orders_dict={}
+    template_name = 'order/order_sum_page.html'
+    orders_dict = {}
     for orderDet in order.orderdetail_set.all():
-        if orders_dict.has_key(orderDet.item_name) :
-            orders_dict[orderDet.item_name] =  orders_dict.get(orderDet.item_name)+orderDet.quantity
+        if orders_dict.has_key(orderDet.item_name):
+            orders_dict[orderDet.item_name] = orders_dict.get(orderDet.item_name) + orderDet.quantity
         else:
             orders_dict[orderDet.item_name] = orderDet.quantity
     return render(request, template_name, {'order': order, 'order_details': orders_dict})
 
+
+def order_sum_redirect(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order.delivery_time = request.POST['delivery_time']
+    order.status = 1
+    order.ordered_at = datetime.datetime.now()
+    order.save()
+    return order_detail_view(request, order_id)
