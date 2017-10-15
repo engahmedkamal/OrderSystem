@@ -3,19 +3,26 @@
 {% block body %}
     <div class="container">
         <div class="panel panel-default">
-            <div class="panel-heading">
-                <center>{{ order }} -
-                    {% if order.status == '0' %}
-                        Open
-                    {% endif %}
-                    {% if order.status == '1' %}
-                        On Delivery
-                    {% endif %}
-                    {% if order.status == '2' %}
-                        Delivered
-                    {% endif %}
-                </center>
+            <div class="panel-heading" align="center">
+                {{ order }} -
+                {% if order.status == '0' %}
+                    Open
+                {% endif %}
+                {% if order.status == '1' %}
+                    On Delivery
+                {% endif %}
+                {% if order.status == '2' %}
+                    Delivered
+                {% endif %}
             </div>
+            {% if order.status == '1' %}
+                <div align="center">
+                    Ordered At : {{ order.ordered_at }}
+                </div>
+                <div align="center">
+                    Delivery Time: {{ order.delivery_time }} minutes
+                </div>
+            {% endif %}
             <div>
                 <center><a target="_blank" href="{{ order.menu_url }}">menu</a></center>
             </div>
@@ -36,23 +43,19 @@
                 {% endfor %}
             </div>
         </div>
-        <div>
+        <div align="center">
             {% if user not in order_detail.keys and order.status == '0' %}
-                <center>
-                    <form method="post" action="{% url 'order:user_order' order.id %}">
-                        {% csrf_token %}
-                        <button class="btn btn-success" type="submit">Add Order</button>
-                    </form>
-                </center>
+                <form method="post" action="{% url 'order:user_order' order.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-success" type="submit">Add Order</button>
+                </form>
             {% endif %}
             {% if user == order.creator and order.status == '0' %}
-                <center>
-                    <form method="post" action="{% url 'order:order_sum' order.id %}">
-                        {% csrf_token %}
-                        <br>
-                        <button class="btn btn-danger" type="submit">Order Now</button>
-                    </form>
-                </center>
+                <form method="post" action="{% url 'order:order_sum' order.id %}">
+                    {% csrf_token %}
+                    <br>
+                    <button class="btn btn-danger" type="submit">Order Now</button>
+                </form>
             {% endif %}
             {% if user == order.creator and order.status == '1' %}
                 <center>
