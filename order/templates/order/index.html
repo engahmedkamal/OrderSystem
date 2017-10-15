@@ -1,7 +1,66 @@
 {% extends 'order/base.html' %}
-{% block albums_active %}active{% endblock %}
+{% block orders_active %}active{% endblock %}
 
 {% block body %}
-<div class="albums-container container-fluid">
-</div>
+    <div class="albums-container container-fluid">
+
+        {% if orders %}
+            <div class="row">
+                <div class="col-sm-12">
+                    <h3>Orders</h3>
+                </div>
+                <div class="col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Creator User</th>
+                                    <th>Creation Date</th>
+                                    <th>Restaurant Name</th>
+                                    <th>Menu URL</th>
+                                    <th>Status</th>
+                                    <th>Options</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.creator.username }}</td>
+                                        <td>{{ order.restaurant_name }}</td>
+                                        <td>{{ order.menu_url }}</td>
+                                        <td>
+                                            {% if order.status == '0' %}
+                                                Open
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if user.id == order.creator.id %}
+                                                <!-- Delete Order -->
+                                                <form action="{% url 'order:delete_order' order.id %}" method="post"
+                                                      style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="order_id" value="{{ order.id }}"/>
+                                                    <button type="submit" class="btn btn-default btn-sm">
+                                                        <span class="glyphicon glyphicon-trash"></span>
+                                                    </button>
+                                                </form>
+                                                <!-- Add Order Detail -->
+                                                {#                                                {% url 'order:detail' order.id %}#}
+                                                <a href="" class="btn btn-default btn-sm btn-favorite" role="button">
+                                                    <span class="glyphicon glyphicon-plus"></span>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
 {% endblock %}
