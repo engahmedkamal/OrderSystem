@@ -27,6 +27,7 @@
                                 {% for order in orders %}
                                     <tr>
                                         <td>{{ order.creator.username }}</td>
+                                        <td>{{ order.timestamp }}</td>
                                         <td>{{ order.restaurant_name }}</td>
                                         <td>{{ order.menu_url }}</td>
                                         <td>
@@ -46,7 +47,6 @@
                                                 <form action="{% url 'order:delete_order' order.id %}" method="post"
                                                       style="display: inline;">
                                                     {% csrf_token %}
-                                                    <input type="hidden" name="order_id" value="{{ order.id }}"/>
                                                     <button type="submit" class="btn btn-default btn-sm">
                                                         <span class="glyphicon glyphicon-trash"></span>
                                                     </button>

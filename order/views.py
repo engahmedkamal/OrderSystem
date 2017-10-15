@@ -1,10 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
+from .forms import UserForm, OrderForm, OrderDetailForm
+from .models import Order, OrderDetail
 from django.shortcuts import render, get_object_or_404
 
-from .forms import UserForm, OrderForm
-from .models import Order
-from .models import OrderDetail
 import datetime
+
 
 def redirect_to_index(request):
     orders = Order.objects.all().order_by('timestamp');
@@ -78,7 +78,29 @@ def delete_order(request, order_id):
     order = Order.objects.get(pk=order_id)
     order.delete()
     return redirect_to_index(request)
+  
+  
+def user_order(request, order_id):
+    user_orders = OrderDetail.objects.filter(user=request.user, order=Order.objects.filter(pk=order_id))
+    return render(request,'order/user_order.html', {'user_orders' : user_orders, 'order_id' : order_id})
 
+
+def create_user_item(request, order_id):
+    form = OrderDetailForm(request.POST or None)
+    if form.is_valid():
+        order_detail = form.save(commit=False)
+        order_detail.user = request.user
+        order_detail.order = Order.objects.get(pk=order_id)
+        order_detail.save()
+        return user_order(request, order_id)
+    return render(request, 'order/create_order.html', {'form' : form})
+
+
+def delete_user_item(request, order_id, user_item_id):
+    order_detail = OrderDetail.objects.get(pk=user_item_id)
+    order_detail.delete()
+    return user_order(request, order_id)
+  
 
 def delete_orderDetail(request, order_id):
     OrderDetail.objects.filter(user__id=request.user.id, order__id=order_id).delete()
@@ -97,6 +119,7 @@ def order_sum(request, order_id):
     return render(request, template_name, {'order': order, 'order_details': orders_dict})
 
 
+
 def order_sum_redirect(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.delivery_time = request.POST['delivery_time']
@@ -104,3 +127,4 @@ def order_sum_redirect(request, order_id):
     order.ordered_at = datetime.datetime.now()
     order.save()
     return order_detail_view(request, order_id)
+
