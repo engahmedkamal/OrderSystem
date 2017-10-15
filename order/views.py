@@ -106,15 +106,22 @@ def delete_orderDetail(request, order_id):
     return order_detail_view(request, order_id)
 
 
-def order_sum(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    template_name = 'order/order_sum_page.html'
+def order_grouping_by_user(order):
     orders_dict = {}
     for orderDet in order.orderdetail_set.all():
         if orders_dict.has_key(orderDet.item_name):
             orders_dict[orderDet.item_name] = orders_dict.get(orderDet.item_name) + orderDet.quantity
         else:
             orders_dict[orderDet.item_name] = orderDet.quantity
+    return orders_dict
+
+
+def order_sum(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order.status = 1
+    order.save()
+    template_name = 'order/order_sum_page.html'
+    orders_dict = order_grouping_by_user(order)
     return render(request, template_name, {'order': order, 'order_details': orders_dict})
 
 
@@ -122,8 +129,13 @@ def order_sum(request, order_id):
 def order_sum_redirect(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.delivery_time = request.POST['delivery_time']
-    order.status = 1
     order.ordered_at = datetime.datetime.now()
     order.save()
     return order_detail_view(request, order_id)
 
+
+def enter_order_values(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    template_name = 'order/order_sum_page.html'
+    orders_dict = order_grouping_by_user(order)
+    return render(request, template_name, {'order': order, 'order_details': orders_dict})
