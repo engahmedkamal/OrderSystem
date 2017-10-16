@@ -3,13 +3,12 @@
 <head>
      <meta charset="UTF-8">
     <title>{% block title %}Ordero{% endblock %}</title>
-    {% load staticfiles %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
-{#    <link rel="stylesheet" type="text/css" href="{% static 'order/style.css' %}"/>#}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-{#    <script src="{% static 'order/js/main.js' %}"></script>#}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style/navBar.css' %}">
 </head>
 <body>
 <nav class="navbar navbar-inverse">
@@ -28,8 +27,8 @@
         <!-- Items -->
         <div class="collapse navbar-collapse" id="topNavBar">
             <ul class="nav navbar-nav">
-                <li class="{% block register_active %}{% endblock %}"><a href="{% url 'order:register' %}">Register</a></li>
-                <li class="{% block login_active %}{% endblock %}"><a href="{% url 'order:login_user' %}">Log In</a></li>
+                <li class="nav-item {% block register_active %}{% endblock %}"><a class="nav-link" href="{% url 'order:register' %}">Register</a></li>
+                <li class="nav-item {% block login_active %}{% endblock %}"><a class="nav-link" href="{% url 'order:login_user' %}">Log In</a></li>
             </ul>
         </div>
 
