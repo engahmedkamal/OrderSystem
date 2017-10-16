@@ -39,7 +39,7 @@
                             {% for user_id, cost in user_costs.items %}
                                 {% if user_id == key.id %}
                                     <div align="right">
-                                        Total Cost : {{ cost }}
+                                        Total Cost : {{ cost|floatformat:2 }}
                                     </div>
                                 {% endif %}
                             {% endfor %}
