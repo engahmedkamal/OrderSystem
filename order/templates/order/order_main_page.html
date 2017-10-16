@@ -57,12 +57,12 @@
                     Add Order
                 </a>
             {% endif %}
-            {% if user == order.creator and order.status == '0' %}
+            {% if user == order.creator and order.status == '0' and order_detail %}
                 <a href="{% url 'order:order_sum' order.id %}" class="btn btn-default btn-danger" role="button">
                     Order Now
                 </a>
             {% endif %}
-            {% if user == order.creator and order.status == '1' %}
+            {% if user == order.creator and order.status == '2' %}
                 <center>
                     <form method="post" action="{% url 'order:order_values' order.id %}">
                         {% csrf_token %}
