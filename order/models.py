@@ -13,8 +13,8 @@ class Order(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=1, default='0')
     delivery_time = models.IntegerField(max_length=3, null=True)
-    ordered_at = models.DateTimeField( null=True)
-    creator = models.ForeignKey(User,on_delete=models.CASCADE)
+    ordered_at = models.DateTimeField(null=True)
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.restaurant_name

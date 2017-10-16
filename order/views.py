@@ -4,6 +4,7 @@ from .models import Order, OrderDetail
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 import datetime
+import decimal
 
 
 def redirect_to_index(request):
@@ -75,11 +76,13 @@ def calculate_user_price(order, user_order_details):
     dic = {}
     delivery_fees = order.delivery_fees / len(user_order_details)
     tax_percentage = order.tax_percentage
+    D = decimal.Decimal
     for user, order_details in user_order_details.items():
-        total_cost = delivery_fees
+        total_cost = D(0.0)
         for order_detail in order_details:
             total_cost += order_detail.price
         total_cost += (total_cost * tax_percentage) / 100
+        total_cost += delivery_fees
         dic[user.id] = str(total_cost)
     return dic
 
@@ -156,7 +159,7 @@ def delete_user_order(request, order_id):
     return order_detail_view(request, order_id)
 
 
-def group_order_details_by_item_value(order):
+def group_order_details_by_item_name(order):
     orders_dict = {}
     for orderDet in order.orderdetail_set.all():
         if orders_dict.has_key(orderDet.item_name):
@@ -171,7 +174,7 @@ def order_sum(request, order_id):
     order.status = 1
     order.save()
     template_name = 'order/order_sum_page.html'
-    orders_dict = group_order_details_by_item_value(order)
+    orders_dict = group_order_details_by_item_name(order)
     return render(request, template_name, {'order': order, 'order_details': orders_dict})
 
 
@@ -189,15 +192,36 @@ def order_sum_redirect(request, order_id):
     return order_detail_view(request, order_id)
 
 
-def enter_order_values(request, order_id):
+def order_values(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    template_name = 'order/order_sum_page.html'
-    orders_dict = group_order_details_by_item_value(order)
-    return render(request, template_name, {'order': order, 'order_details': orders_dict})
+    orders_dict = group_order_details_by_item_name(order)
+    return render(request, 'order/order_values_page.html', {'order': order, 'order_details': orders_dict})
 
 
 def order_reopen(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     order.status = 0
+    order.save()
+    return order_detail_view(request, order_id)
+
+def submit_order_values(request, order_id):
+    d = decimal.Decimal
+    order = get_object_or_404(Order, id=order_id)
+    orders_dict = group_order_details_by_item_name(order)
+    tax_percentage = request.POST['tax_rate']
+    delivery_fees = request.POST['delivery_value']
+    total_price = d(0.0)
+    for order_detail in order.orderdetail_set.all():
+        item_total_value = request.POST[order_detail.item_name]
+        item_price = decimal.Decimal(item_total_value) / d(orders_dict.get(order_detail.item_name))
+        order_detail.price = item_price * order_detail.quantity
+        order_detail.save()
+    for k,v in orders_dict.items() :
+        item_total_value = request.POST[k]
+        total_price += d(item_total_value) + d(item_total_value) * d(tax_percentage)/100
+    order.total_price = total_price + d(delivery_fees)
+    order.delivery_fees = delivery_fees
+    order.tax_percentage = tax_percentage
+    order.status = 3
     order.save()
     return order_detail_view(request, order_id)
