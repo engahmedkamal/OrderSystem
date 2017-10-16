@@ -25,6 +25,10 @@
                            class="btn btn-default btn-sm btn-favorite" role="button">
                             <span class="glyphicon glyphicon-trash"></span>
                         </a>
+                        <a href="{% url 'order:edit_user_item' user_order.id %}"
+                           class="btn btn-default btn-sm btn-favorite" role="button">
+                            <span class="glyphicon glyphicon-edit"></span>
+                        </a>
                     </td>
                 </tr>
             {% endfor %}

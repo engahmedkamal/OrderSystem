@@ -20,11 +20,11 @@
                     Ordered At : {{ order.ordered_at }}
                 </div>
                 <div align="center">
-                    Delivery Time: {{ order.delivery_time }} minutes
+                    Delivery Time : {{ order.delivery_time }} minutes
                 </div>
             {% endif %}
-            <div>
-                <center><a target="_blank" href="{{ order.menu_url }}">menu</a></center>
+            <div align="center">
+                <a href="{{ order.menu_url }}">menu</a>
             </div>
             <div class="panel-body">
                 {% for key,v in order_detail.items %}
@@ -35,6 +35,13 @@
                                 <a href="{% url 'order:user_order' order.id %}">edit</a>
                                 <a href="{% url 'order:delete_user_order' order.id %}">delete</a>
                             {% endif %}
+                            {% for user_id, cost in user_costs.items %}
+                                {% if user_id == key.id %}
+                                    <div align="right">
+                                        Total Cost : {{ cost }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                         {% for order in v %}
                             <div class="panel-body">{{ order.item_name }} - {{ order.quantity }}</div>

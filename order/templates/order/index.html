@@ -29,11 +29,7 @@
                                         <td>{{ order.creator.username }}</td>
                                         <td>{{ order.timestamp }}</td>
                                         <td>
-                                            {% if order.status != '0' %}
-                                                <a href="{% url 'order:main_order' order.id %}">{{ order.restaurant_name }}</a>
-                                            {% else %}
-                                                {{ order.restaurant_name }}
-                                            {% endif %}
+                                            <a href="{% url 'order:main_order' order.id %}">{{ order.restaurant_name }}</a>
                                         </td>
                                         <td><a href="{{ order.menu_url }}">Menu</a></td>
                                         <td>
@@ -55,9 +51,9 @@
                                                 </a>
                                             {% endif %}
                                             {% if order.status == '0' %}
-                                                <a href="{% url 'order:main_order' order.id %}"
+                                                <a href="{% url 'order:edit_order' order.id %}"
                                                    class="btn btn-default btn-sm btn-favorite" role="button">
-                                                    <span class="glyphicon glyphicon-plus"></span>
+                                                    <span class="glyphicon glyphicon-edit"></span>
                                                 </a>
                                             {% endif %}
                                         </td>

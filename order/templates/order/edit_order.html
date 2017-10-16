@@ -1,0 +1,22 @@
+{% extends 'order/base.html' %}
+{% block title %}Edit Existing Order{% endblock %}
+{% block orders_active %}active{% endblock %}
+
+{% block body %}
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <h3 align="center">Edit {{ order_name }}</h3>
+            {% if error_message %}
+                <p><strong>{{ error_message }}</strong></p>
+            {% endif %}
+            <div align="center">
+                <form class="form-horizontal" role="form" action="" method="post">
+                    {% csrf_token %}
+                    {% include 'order/form_template.html' %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
