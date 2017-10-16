@@ -67,7 +67,7 @@ def order_detail_view(request, order_id):
     template_name = 'order/order_main_page.html'
     users_order_details = user_order_details_for_order(order)
     context = {'order': order, 'order_detail': users_order_details}
-    if order.status == '2':
+    if order.status == '3':
         context['user_costs'] = calculate_user_price(order, users_order_details)
     return render(request, template_name, context)
 
@@ -159,7 +159,7 @@ def delete_user_order(request, order_id):
     return order_detail_view(request, order_id)
 
 
-def group_order_details_by_item_name(order):
+def group_order_details_by_item_value(order):
     orders_dict = {}
     for orderDet in order.orderdetail_set.all():
         if orders_dict.has_key(orderDet.item_name):
@@ -174,7 +174,7 @@ def order_sum(request, order_id):
     order.status = 1
     order.save()
     template_name = 'order/order_sum_page.html'
-    orders_dict = group_order_details_by_item_name(order)
+    orders_dict = group_order_details_by_item_value(order)
     return render(request, template_name, {'order': order, 'order_details': orders_dict})
 
 
@@ -194,7 +194,7 @@ def order_sum_redirect(request, order_id):
 
 def order_values(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    orders_dict = group_order_details_by_item_name(order)
+    orders_dict = group_order_details_by_item_value(order)
     return render(request, 'order/order_values_page.html', {'order': order, 'order_details': orders_dict})
 
 
@@ -204,16 +204,41 @@ def order_reopen(request, order_id):
     order.save()
     return order_detail_view(request, order_id)
 
+
+def valid_order_values(request, order):
+    tax_rate = request.POST['tax_rate']
+    if not valid_decimal(tax_rate):
+        return False
+    delivery_value = request.POST['delivery_value']
+    if not valid_decimal(delivery_value):
+        return False
+    for order_detail in order.orderdetail_set.all():
+        item_total_value = request.POST[order_detail.item_name]
+        if not valid_decimal(item_total_value):
+            return False
+    return True
+
+
+def valid_decimal(value):
+    try:
+        decimal.Decimal(value)
+        return True
+    except decimal.InvalidOperation:
+        return False
+
+
 def submit_order_values(request, order_id):
     d = decimal.Decimal
     order = get_object_or_404(Order, id=order_id)
-    orders_dict = group_order_details_by_item_name(order)
+    orders_dict = group_order_details_by_item_value(order)
+    if not valid_order_values(request, order):
+        return render(request, 'order/order_values_page.html', {'order': order, 'order_details': orders_dict, 'errors' : True})
     tax_percentage = request.POST['tax_rate']
     delivery_fees = request.POST['delivery_value']
     total_price = d(0.0)
     for order_detail in order.orderdetail_set.all():
         item_total_value = request.POST[order_detail.item_name]
-        item_price = decimal.Decimal(item_total_value) / d(orders_dict.get(order_detail.item_name))
+        item_price = d(item_total_value) / d(orders_dict.get(order_detail.item_name))
         order_detail.price = item_price * order_detail.quantity
         order_detail.save()
     for k,v in orders_dict.items() :
