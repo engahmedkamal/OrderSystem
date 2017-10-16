@@ -2,8 +2,8 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import UserForm, OrderForm, OrderDetailForm
 from .models import Order, OrderDetail
 from django.shortcuts import render, get_object_or_404
-
 import datetime
+
 
 def redirect_to_index(request):
     orders = Order.objects.all().order_by('timestamp');
@@ -57,10 +57,33 @@ def register(request):
 def order_detail_view(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     template_name = 'order/order_main_page.html'
-    order_detail_grouped_by_user = dict()
-    for obj in order.orderdetail_set.all():
-        order_detail_grouped_by_user.setdefault(obj.user, []).append(obj)
-    return render(request, template_name, {'order': order, 'order_detail': order_detail_grouped_by_user})
+    users_order_details = user_order_details_for_order(order)
+    context = {'order': order, 'order_detail': users_order_details}
+    if order.status == '2':
+        context['user_costs'] = calculate_user_price(order, users_order_details)
+    return render(request, template_name, context)
+
+
+def calculate_user_price(order, user_order_details):
+    dic = {}
+    delivery_fees = order.delivery_fees / len(user_order_details)
+    tax_percentage = order.tax_percentage
+    for user, order_details in user_order_details.items():
+        total_cost = delivery_fees
+        for order_detail in order_details:
+            total_cost += order_detail.price
+        total_cost += (total_cost * tax_percentage) / 100
+        dic[user.id] = str(total_cost)
+    return dic
+
+
+def user_order_details_for_order(order):
+    dic = {}
+    for order_detail in order.orderdetail_set.all():
+        if not dic.has_key(order_detail.user):
+            dic[order_detail.user] = []
+        dic[order_detail.user].append(order_detail)
+    return dic;
 
 
 def create_order(request):
@@ -73,15 +96,25 @@ def create_order(request):
     return render(request, 'order/create_order.html', {'form': form})
 
 
+def edit_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    form = OrderForm(request.POST or None, instance=order)
+    if form.is_valid():
+        order = form.save(commit=False)
+        order.save()
+        return redirect_to_index(request)
+    return render(request, 'order/edit_order.html', {'form': form, 'order_name': order.restaurant_name})
+
+
 def delete_order(request, order_id):
     order = Order.objects.get(pk=order_id)
     order.delete()
     return redirect_to_index(request)
-  
-  
+
+
 def user_order(request, order_id):
     user_orders = OrderDetail.objects.filter(user=request.user, order=Order.objects.filter(pk=order_id))
-    return render(request,'order/user_order.html', {'user_orders' : user_orders, 'order_id' : order_id})
+    return render(request, 'order/user_order.html', {'user_orders': user_orders, 'order_id': order_id})
 
 
 def create_user_item(request, order_id):
@@ -92,21 +125,31 @@ def create_user_item(request, order_id):
         order_detail.order = Order.objects.get(pk=order_id)
         order_detail.save()
         return user_order(request, order_id)
-    return render(request, 'order/create_user_item.html', {'form' : form})
+    return render(request, 'order/create_user_item.html', {'form': form})
+
+
+def edit_user_item(request, user_item_id):
+    order_detail = get_object_or_404(OrderDetail, id=user_item_id)
+    form = OrderDetailForm(request.POST or None, instance=order_detail)
+    if form.is_valid():
+        order_detail = form.save(commit=False)
+        order_detail.save()
+        return user_order(request, order_detail.order.id)
+    return render(request, 'order/edit_user_item.html', {'form': form, 'item_name': order_detail.item_name})
 
 
 def delete_user_item(request, order_id, user_item_id):
-    order_detail = OrderDetail.objects.get(pk=user_item_id)
+    order_detail = get_object_or_404(OrderDetail, id=user_item_id)
     order_detail.delete()
     return user_order(request, order_id)
-  
+
 
 def delete_orderDetail(request, order_id):
     OrderDetail.objects.filter(user__id=request.user.id, order__id=order_id).delete()
     return order_detail_view(request, order_id)
 
 
-def order_grouping_by_user(order):
+def group_order_details_by_item_value(order):
     orders_dict = {}
     for orderDet in order.orderdetail_set.all():
         if orders_dict.has_key(orderDet.item_name):
@@ -121,9 +164,8 @@ def order_sum(request, order_id):
     order.status = 1
     order.save()
     template_name = 'order/order_sum_page.html'
-    orders_dict = order_grouping_by_user(order)
+    orders_dict = group_order_details_by_item_value(order)
     return render(request, template_name, {'order': order, 'order_details': orders_dict})
-
 
 
 def order_sum_redirect(request, order_id):
@@ -136,5 +178,6 @@ def order_sum_redirect(request, order_id):
 
 def order_values(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    orders_dict = order_grouping_by_user(order)
-    return render(request, 'order/order_values_page.html', {'order': order, 'order_details': orders_dict})
+    template_name = 'order/order_sum_page.html'
+    orders_dict = group_order_details_by_item_value(order)
+    return render(request, template_name, {'order': order, 'order_details': orders_dict})
