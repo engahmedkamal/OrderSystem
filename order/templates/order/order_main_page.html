@@ -7,15 +7,15 @@
                 {{ order }} -
                 {% if order.status == '0' %}
                     Open
-                {% endif %}
-                {% if order.status == '1' %}
+                {% elif order.status == '1' %}
+                    Pending
+                {% elif order.status == '2' %}
                     On Delivery
-                {% endif %}
-                {% if order.status == '2' %}
+                {% elif order.status == '3' %}
                     Delivered
                 {% endif %}
             </div>
-            {% if order.status == '1' %}
+            {% if order.status == '2' %}
                 <div align="center">
                     Ordered At : {{ order.ordered_at }}
                 </div>
@@ -52,17 +52,14 @@
         </div>
         <div align="center">
             {% if user not in order_detail.keys and order.status == '0' %}
-                <form method="post" action="{% url 'order:user_order' order.id %}">
-                    {% csrf_token %}
-                    <button class="btn btn-success" type="submit">Add Order</button>
-                </form>
+                <a href="{% url 'order:create_user_item' order.id %}" class="btn btn-default btn-success" role="button">
+                    Add Order
+                </a>
             {% endif %}
             {% if user == order.creator and order.status == '0' %}
-                <form method="post" action="{% url 'order:order_sum' order.id %}">
-                    {% csrf_token %}
-                    <br>
-                    <button class="btn btn-danger" type="submit">Order Now</button>
-                </form>
+                <a href="{% url 'order:order_sum' order.id %}" class="btn btn-default btn-danger" role="button">
+                    Order Now
+                </a>
             {% endif %}
         </div>
     </div>
