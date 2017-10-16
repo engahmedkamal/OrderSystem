@@ -64,6 +64,15 @@
                     <button class="btn btn-danger" type="submit">Order Now</button>
                 </form>
             {% endif %}
+            {% if user == order.creator and order.status == '1' %}
+                <center>
+                    <form method="post" action="{% url 'order:order_values' order.id %}">
+                        {% csrf_token %}
+                        <br>
+                        <button class="btn btn-danger" type="submit">Order received</button>
+                    </form>
+                </center>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
