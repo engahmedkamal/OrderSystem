@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 class Order(models.Model):
     restaurant_name = models.CharField(max_length=250)
     delivery_fees = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    menu_url = models.CharField(max_length=400)
-    tax_percentage = models.DecimalField(max_digits=3, decimal_places=1, default=0, null=True)
+    menu_url = models.URLField(max_length=400)
+    tax_percentage = models.DecimalField(max_digits=3, decimal_places=1, null=True)
     total_price = models.DecimalField(max_digits=7, decimal_places=2, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=1, default='0')

@@ -1,13 +1,20 @@
 from django.contrib.auth import authenticate, login, logout
 from .forms import UserForm, OrderForm, OrderDetailForm
 from .models import Order, OrderDetail
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 import datetime
 import decimal
 
 
 def redirect_to_index(request):
-    orders = Order.objects.all().order_by('timestamp');
+    orders = Order.objects.all().order_by('timestamp').reverse();
+    search_text = request.GET.get("search_text")
+    if search_text:
+        orders = orders.filter(
+            Q(restaurant_name__contains=search_text)
+        ).distinct()
+        return render(request, 'order/index.html', {'orders': orders, 'search_text': search_text})
     return render(request, 'order/index.html', {'orders': orders})
 
 
@@ -147,7 +154,7 @@ def delete_user_item(request, order_id, user_item_id):
     return user_order(request, order_id)
 
 
-def delete_orderDetail(request, order_id):
+def delete_user_order(request, order_id):
     OrderDetail.objects.filter(user__id=request.user.id, order__id=order_id).delete()
     return order_detail_view(request, order_id)
 
@@ -173,8 +180,14 @@ def order_sum(request, order_id):
 
 def order_sum_redirect(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    order.delivery_time = request.POST['delivery_time']
+    delivery_time = request.POST['delivery_time']
+    if delivery_time and int(delivery_time) >= 15:
+        order.delivery_time = int(delivery_time)
+    else:
+        orders_dict = group_order_details_by_item_value(order)
+        return render(request, 'order/order_sum_page.html', {'order': order, 'order_details': orders_dict, 'delivery_time_error': True})
     order.ordered_at = datetime.datetime.now()
+    order.status = 2
     order.save()
     return order_detail_view(request, order_id)
 
@@ -184,6 +197,12 @@ def order_values(request, order_id):
     orders_dict = group_order_details_by_item_name(order)
     return render(request, 'order/order_values_page.html', {'order': order, 'order_details': orders_dict})
 
+
+def order_reopen(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order.status = 0
+    order.save()
+    return order_detail_view(request, order_id)
 
 def submit_order_values(request, order_id):
     d = decimal.Decimal
@@ -203,6 +222,6 @@ def submit_order_values(request, order_id):
     order.total_price = total_price + d(delivery_fees)
     order.delivery_fees = delivery_fees
     order.tax_percentage = tax_percentage
-    order.status = 2
+    order.status = 3
     order.save()
     return order_detail_view(request, order_id)
